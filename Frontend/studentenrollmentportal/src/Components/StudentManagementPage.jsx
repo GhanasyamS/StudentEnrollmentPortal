@@ -158,7 +158,7 @@ const StudentManagementPage = () => {
             )}
           </Box>
           
-          {/* Results Summary */}
+          {/* Results Summary info here */}
           <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" color="text.secondary">
               Showing {filteredStudents.length} of {students.length} students
@@ -174,7 +174,7 @@ const StudentManagementPage = () => {
           </Box>
         </Box>
 
-        {/* Students Grid */}
+        {/* Students Grid  */}
         <Grid justifyContent="center" container spacing={3}>
           {filteredStudents.map((student) => (
             <Grid xs={12} sm={6} md={4} key={student.studentID}>
@@ -195,7 +195,7 @@ const StudentManagementPage = () => {
                 }}
               >
                 <CardContent sx={{ p: 3 }}>
-                  {/* Student Avatar and Name */}
+                  {/* Student Avatar and Name here */}
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                     <Avatar 
                       sx={{ 
@@ -225,7 +225,7 @@ const StudentManagementPage = () => {
                     </Box>
                   </Box>
 
-                  {/* Student Details */}
+                  {/* Student Details here */}
                   <Box sx={{ space: 1.5 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                       <Email sx={{ fontSize: 16, color: '#718096', mr: 1 }} />
@@ -286,7 +286,7 @@ const StudentManagementPage = () => {
           ))}
         </Grid>
 
-        {/* Empty State */}
+        {/* No student registered in the course then */}
         {filteredStudents.length === 0 && students.length > 0 && (
           <Box sx={{ textAlign: 'center', mt: 6 }}>
             <Person sx={{ fontSize: 64, color: '#cbd5e0', mb: 2 }} />
@@ -299,7 +299,7 @@ const StudentManagementPage = () => {
           </Box>
         )}
 
-        {/* Snackbar */}
+        
         <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={handleCloseSnackbar}>
           <Alert 
             onClose={handleCloseSnackbar} 
