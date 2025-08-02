@@ -3,6 +3,7 @@ package com.assessment.studentenrollmentservice.Service;
 import com.assessment.studentenrollmentservice.Domain.Course;
 import com.assessment.studentenrollmentservice.Domain.Student;
 import com.assessment.studentenrollmentservice.Exception.InvalidStudentException;
+import com.assessment.studentenrollmentservice.Exception.StudentNotFoundException;
 
 import java.util.List;
 
@@ -15,8 +16,10 @@ public interface IStudentService
     Student getStudentById(Long id);
     Student updateStudent(Long id, Student updatedStudent);
     void deleteStudent(Long id);
-    boolean validateStudent(Student student) ;
-    void updateStudentCourse(long studentID,Course course);
-    void updateStudentSemester(long studentID,int semester);
+    void validateStudent(Student student) ;
+    Student updateStudentCourse(long studentID,Course course);
+    Student updateStudentSemester(long studentID,int semester);
+    List<Student> fetchStudentsInCourse(Course course);
+    Student fetchStudentByEmail(String email) throws StudentNotFoundException;
 //    List<Student> filterStudents(String course, Integer semester, String gender);
 }

@@ -6,11 +6,13 @@ import com.assessment.studentenrollmentservice.Exception.InvalidStudentException
 import com.assessment.studentenrollmentservice.Exception.StudentNotFoundException;
 import com.assessment.studentenrollmentservice.Repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 
+@Service
 public class StudentService implements IStudentService
 {
     private StudentRepository studentRepository;
@@ -21,17 +23,11 @@ public class StudentService implements IStudentService
     }
 
     @Override
-    public Student createStudent(Student student) throws InvalidStudentException
-    {
-        if(validateStudent(student))
-        {
-            studentRepository.save(student);
-        }
-        else
-         throw new InvalidStudentException("Student is under 18");
-
-        return student;
+    public Student createStudent(Student student) {
+        validateStudent(student); //exception thrown here
+        return studentRepository.save(student);
     }
+
 
     @Override
     public List<Student> getAllStudents()
@@ -48,65 +44,85 @@ public class StudentService implements IStudentService
     @Override
     public Student updateStudent(Long studentId, Student updatedStudent) throws InvalidStudentException
     {
-      Student existingStudent = studentRepository.findByStudentID(studentId);
-      if(validateStudent(updatedStudent))
-      {
-          existingStudent.setStudentName(updatedStudent.getStudentName());
-          existingStudent.setStudentGender(updatedStudent.getStudentGender());
-          existingStudent.setStudentDOB(updatedStudent.getStudentDOB());
-          existingStudent.setStudentEmail(updatedStudent.getStudentEmail());
-          existingStudent.setStudentMobile(updatedStudent.getStudentMobile());
-          existingStudent.setStudentAddress(updatedStudent.getStudentAddress());
-          existingStudent.setEnrolledCourse(updatedStudent.getEnrolledCourse());
-          existingStudent.setStudentSemester(updatedStudent.getStudentSemester());
-          existingStudent.setStudentLastExamPercentage(updatedStudent.getStudentLastExamPercentage());
+        Student existingStudent = studentRepository.findById(studentId)
+                .orElseThrow(() -> new StudentNotFoundException("Student Not Found with Id: " + studentId));
 
-          return studentRepository.save(existingStudent);
-      }
-      else throw new InvalidStudentException("Invalid Student Details");
-    }
+        existingStudent.setStudentName(updatedStudent.getStudentName());
+        existingStudent.setStudentGender(updatedStudent.getStudentGender());
+        existingStudent.setStudentDOB(updatedStudent.getStudentDOB());
+        existingStudent.setStudentEmail(updatedStudent.getStudentEmail());
+        existingStudent.setStudentMobile(updatedStudent.getStudentMobile());
+        existingStudent.setStudentAddress(updatedStudent.getStudentAddress());
+        existingStudent.setEnrolledCourse(updatedStudent.getEnrolledCourse());
+        existingStudent.setStudentSemester(updatedStudent.getStudentSemester());
+        existingStudent.setStudentLastExamPercentage(updatedStudent.getStudentLastExamPercentage());
 
-    @Override
-    public void deleteStudent(Long id)
-    {
-        studentRepository.deleteById(id);
+        validateStudent(existingStudent);
+        return studentRepository.save(existingStudent);
 
     }
 
     @Override
-    public boolean validateStudent(Student student)
+    public void deleteStudent(Long id) {
+        Student existingStudent = studentRepository.findById(id)
+                .orElseThrow(() -> new StudentNotFoundException("Student Not Found with Id: " + id));
+        studentRepository.delete(existingStudent);
+    }
+
+
+    @Override
+    public Student updateStudentCourse(long studentID, Course course) {
+        Student currentStudentData = studentRepository.findById(studentID)
+                .orElseThrow(() -> new StudentNotFoundException("Student Not Found with Id: " + studentID));
+
+        currentStudentData.setEnrolledCourse(course);
+        validateStudent(currentStudentData);
+        return studentRepository.save(currentStudentData);
+    }
+
+    @Override
+    public Student updateStudentSemester(long studentID, int semester) {
+        Student currentStudentData = studentRepository.findById(studentID)
+                .orElseThrow(() -> new StudentNotFoundException("Student Not Found with Id: " + studentID));
+        validateStudent(currentStudentData);
+        currentStudentData.setStudentSemester(semester);
+        return studentRepository.save(currentStudentData);
+
+    }
+
+    @Override
+    public List<Student> fetchStudentsInCourse(Course course)
     {
+        return studentRepository.findByEnrolledCourse(course);
+    }
+
+    @Override
+    public Student fetchStudentByEmail(String email) throws StudentNotFoundException
+    {
+        Student student = studentRepository.findByStudentEmail(email);
+        if (student == null) {
+            throw new StudentNotFoundException("Student not found with email: " + email);
+        }
+        return student;
+    }
+//all validation should go here
+    public void validateStudent(Student student) {
         int selectedSemester = student.getStudentSemester();
         int maxSemester = student.getEnrolledCourse().getTotalSemesters();
 
-        if(selectedSemester<1||selectedSemester>maxSemester)
-        {
-            return false;
+        if (selectedSemester < 1 || selectedSemester > maxSemester) {
+            throw new InvalidStudentException("Semester must be between 1 and " + maxSemester + " for course " + student.getEnrolledCourse());
         }
 
         LocalDate today = LocalDate.now();
         int age = Period.between(student.getStudentDOB(), today).getYears();
-        if (age < 16)
-        {
-            return false;
+        if (age < 16) {
+            throw new InvalidStudentException("Student must be at least 16 years old.");
         }
-        return true;
+
+        if (student.getStudentLastExamPercentage() < 0 || student.getStudentLastExamPercentage() > 100) {
+            throw new InvalidStudentException("Percentage must be between 0 and 100.");
+        }
     }
 
-    @Override
-    public void updateStudentCourse(long studentID,Course course)
-    {
-        Student currentStudentData = studentRepository.findByStudentID(studentID);
-        currentStudentData.setEnrolledCourse(course);
-        studentRepository.save(currentStudentData);
-    }
-
-    @Override
-    public void updateStudentSemester(long studentID,int semester)
-    {
-        Student currentStudentData = studentRepository.findByStudentID(studentID);
-        currentStudentData.setStudentSemester(semester);
-        studentRepository.save(currentStudentData);
-
-    }
 }
