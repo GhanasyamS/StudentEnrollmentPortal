@@ -31,10 +31,10 @@ public class Student
     @Column(nullable = false, unique = true)
     private String studentEmail;
 
-    @NotNull(message = "Mobile number is required")
-    @Digits(integer = 10, fraction = 0, message = "Mobile number must be 10 digits")
+    @NotBlank(message = "Mobile number is required")
+    @Pattern(regexp = "\\d{10}", message = "Mobile number must be exactly 10 digits")
     @Column(nullable = false, unique = true)
-    private Long studentMobile;
+    private String studentMobile;
 
     @NotBlank(message = "Address is required")
     @Column(nullable = false, length = 500)
@@ -59,7 +59,7 @@ public class Student
     }
 
     public Student(Long studentID, String studentName, Gender studentGender, LocalDate studentDOB, String studentEmail,
-                   Long studentMobile, String studentAddress, Course enrolledCourse, Integer studentSemester, Integer studentLastExamPercentage)
+                   String studentMobile, String studentAddress, Course enrolledCourse, Integer studentSemester, Integer studentLastExamPercentage)
     {
         this.studentID = studentID;
         this.studentName = studentName;
@@ -113,11 +113,11 @@ public class Student
         this.studentEmail = studentEmail;
     }
 
-    public Long getStudentMobile() {
+    public String getStudentMobile() {
         return studentMobile;
     }
 
-    public void setStudentMobile(Long studentMobile) {
+    public void setStudentMobile(String studentMobile) {
         this.studentMobile = studentMobile;
     }
 

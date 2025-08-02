@@ -3,6 +3,7 @@ package com.assessment.studentenrollmentservice.Controller;
 import com.assessment.studentenrollmentservice.Domain.Course;
 import com.assessment.studentenrollmentservice.Domain.Student;
 import com.assessment.studentenrollmentservice.Service.IStudentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class StudentController
 
 
     @PostMapping("/create")
-    public ResponseEntity<Student> createStudent(@RequestBody Student student)
+    public ResponseEntity<Student> createStudent(@RequestBody @Valid Student student)
     {
         Student createdStudent = studentService.createStudent(student);
         return ResponseEntity.ok(createdStudent);
